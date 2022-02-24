@@ -109,7 +109,7 @@ func ThumbnailImage(img image.Image, topt *ThumbOption) (image.Image, error) {
 }
 
 // Thumbnail ...
-func Thumbnail(r io.Reader, w io.Writer, topt ThumbOption) error {
+func Thumbnail(r io.Reader, w io.Writer, topt *ThumbOption) error {
 	var err error
 	im, format, err := image.Decode(r)
 	if err != nil {
@@ -139,13 +139,13 @@ func Thumbnail(r io.Reader, w io.Writer, topt ThumbOption) error {
 }
 
 // ThumbnailImageTo ...
-func ThumbnailImageTo(im image.Image, w io.Writer, topt ThumbOption) error {
-	m, err := ThumbnailImage(im, &topt)
+func ThumbnailImageTo(im image.Image, w io.Writer, topt *ThumbOption) error {
+	m, err := ThumbnailImage(im, topt)
 	if err != nil {
 		return err
 	}
 
-	opt := topt.WriteOption
+	opt := &topt.WriteOption
 	_, err = SaveTo(w, m, opt)
 	if err != nil {
 		log.Print(err)
@@ -156,7 +156,7 @@ func ThumbnailImageTo(im image.Image, w io.Writer, topt ThumbOption) error {
 }
 
 // ThumbnailFile ...
-func ThumbnailFile(src, dest string, topt ThumbOption) (err error) {
+func ThumbnailFile(src, dest string, topt *ThumbOption) (err error) {
 	var in *os.File
 	in, err = os.Open(src)
 	if err != nil {

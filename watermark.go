@@ -134,7 +134,7 @@ func Watermark(r, wr io.Reader, w io.Writer, wo WaterOption) error {
 		return err
 	}
 
-	opt := wo.WriteOption
+	opt := &wo.WriteOption
 	_, err = SaveTo(w, m, opt)
 	if err != nil {
 		return err
@@ -144,7 +144,7 @@ func Watermark(r, wr io.Reader, w io.Writer, wo WaterOption) error {
 }
 
 // WatermarkFile ...
-func WatermarkFile(src, dest string, wo WaterOption) (err error) {
+func WatermarkFile(src, wname, dest string, wo WaterOption) (err error) {
 	var in, wr, out *os.File
 	in, err = os.Open(src)
 	if err != nil {
@@ -152,7 +152,7 @@ func WatermarkFile(src, dest string, wo WaterOption) (err error) {
 	}
 	defer in.Close()
 
-	wr, err = os.Open(wo.Filename)
+	wr, err = os.Open(wname)
 	if err != nil {
 		return
 	}

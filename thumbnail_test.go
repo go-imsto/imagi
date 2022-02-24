@@ -37,9 +37,9 @@ func TestThumbnails(t *testing.T) {
 
 	// var err error
 	for i, topt := range topts {
-		err = Thumbnail(bytes.NewReader(data), &buf, topt)
+		err = Thumbnail(bytes.NewReader(data), &buf, &topt)
 		if err != nil {
-			t.Fatalf("Thumbnail '%s' error: %s", topt, err)
+			t.Fatalf("Thumbnail '%s' error: %s", &topt, err)
 		}
 		t.Logf("%d thumbnail ok, d %dx%d, f %s", i, topt.Width, topt.Height, topt.Format)
 	}

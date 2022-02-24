@@ -92,7 +92,10 @@ func (o *WriteOption) patch() {
 }
 
 // SaveTo ...
-func (im *Image) SaveTo(w io.Writer, opt WriteOption) error {
+func (im *Image) SaveTo(w io.Writer, opt *WriteOption) error {
+	if opt == nil {
+		opt = new(WriteOption)
+	}
 	if opt.Format == "" {
 		opt.Format = im.Format
 	}
@@ -114,7 +117,10 @@ func (im *Image) SaveTo(w io.Writer, opt WriteOption) error {
 }
 
 // SaveTo ...
-func SaveTo(w io.Writer, m image.Image, opt WriteOption) (n int, err error) {
+func SaveTo(w io.Writer, m image.Image, opt *WriteOption) (n int, err error) {
+	if opt == nil {
+		opt = new(WriteOption)
+	}
 	cw := new(CountWriter)
 	defer func() { n = cw.Len() }()
 	w = io.MultiWriter(w, cw)
@@ -154,7 +160,7 @@ func SaveTo(w io.Writer, m image.Image, opt WriteOption) (n int, err error) {
 }
 
 // ThumbnailTo ...
-func (im *Image) ThumbnailTo(w io.Writer, topt ThumbOption) error {
+func (im *Image) ThumbnailTo(w io.Writer, topt *ThumbOption) error {
 	if im.m == nil {
 		return ErrEmptyImage
 	}
