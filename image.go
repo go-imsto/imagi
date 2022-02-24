@@ -164,5 +164,8 @@ func (im *Image) ThumbnailTo(w io.Writer, topt *ThumbOption) error {
 	if im.m == nil {
 		return ErrEmptyImage
 	}
+	if topt.Format == "" {
+		topt.Format = im.Format
+	}
 	return ThumbnailImageTo(im.m, w, topt)
 }
