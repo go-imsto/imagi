@@ -119,6 +119,9 @@ func Watermark(r, wr io.Reader, w io.Writer, wo WaterOption) error {
 		log.Printf("Watermark: decode src error: %s", err)
 		return err
 	}
+	if wo.Format == "" {
+		wo.Format = format
+	}
 
 	water, _, err := image.Decode(wr)
 	if err != nil {
@@ -132,12 +135,6 @@ func Watermark(r, wr io.Reader, w io.Writer, wo WaterOption) error {
 	}
 
 	opt := wo.WriteOption
-	if opt.Format != "" {
-		opt.Format = Ext2Format(opt.Format)
-	} else {
-		opt.Format = format
-	}
-
 	_, err = SaveTo(w, m, opt)
 	if err != nil {
 		return err

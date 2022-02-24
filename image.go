@@ -35,6 +35,12 @@ var (
 	}
 )
 
+// Imager ...
+type Imager interface {
+	SaveTo(w io.Writer, opt WriteOption) error
+	ThumbnailTo(w io.Writer, topt ThumbOption) error
+}
+
 // Image ...
 type Image struct {
 	*Attr
@@ -81,6 +87,10 @@ type WriteOption struct {
 	Quality Quality
 }
 
+func (o *WriteOption) patch() {
+	o.Format = PatchFormat(o.Format)
+}
+
 // SaveTo ...
 func (im *Image) SaveTo(w io.Writer, opt WriteOption) error {
 	if opt.Format == "" {
@@ -108,6 +118,7 @@ func SaveTo(w io.Writer, m image.Image, opt WriteOption) (n int, err error) {
 	cw := new(CountWriter)
 	defer func() { n = cw.Len() }()
 	w = io.MultiWriter(w, cw)
+	opt.patch()
 	switch opt.Format {
 	case FormatJPEG:
 		qlt := int(opt.Quality)
@@ -140,4 +151,12 @@ func SaveTo(w io.Writer, m image.Image, opt WriteOption) (n int, err error) {
 	}
 
 	return
+}
+
+// ThumbnailTo ...
+func (im *Image) ThumbnailTo(w io.Writer, topt ThumbOption) error {
+	if im.m == nil {
+		return ErrEmptyImage
+	}
+	return ThumbnailImageTo(im.m, w, topt)
 }

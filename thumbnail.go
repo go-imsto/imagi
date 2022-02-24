@@ -87,7 +87,7 @@ func ThumbnailImage(img image.Image, topt *ThumbOption) (image.Image, error) {
 
 	if ow <= topt.Width && oh <= topt.Height {
 		log.Printf("ThumbnailImage %dx%d <= %dx%d", ow, oh, topt.Width, topt.Height)
-		return nil, ErrOrigTooSmall
+		return img, nil
 	}
 
 	err := topt.calc(ow, oh)
@@ -116,8 +116,11 @@ func Thumbnail(r io.Reader, w io.Writer, topt ThumbOption) error {
 		log.Printf("Thumbnail image decode error: %s", err)
 		return err
 	}
+	if topt.Format == "" {
+		topt.Format = format
+	}
 
-	m, err := ThumbnailImage(im, &topt)
+	err = ThumbnailImageTo(im, w, topt)
 	if err != nil {
 		if err == ErrOrigTooSmall {
 			if rr, ok := r.(io.Seeker); ok {
@@ -131,16 +134,18 @@ func Thumbnail(r io.Reader, w io.Writer, topt ThumbOption) error {
 			}
 			log.Printf("copy error %s", err)
 		}
+	}
+	return err
+}
+
+// ThumbnailImageTo ...
+func ThumbnailImageTo(im image.Image, w io.Writer, topt ThumbOption) error {
+	m, err := ThumbnailImage(im, &topt)
+	if err != nil {
 		return err
 	}
 
 	opt := topt.WriteOption
-	if opt.Format != "" {
-		opt.Format = Ext2Format(opt.Format)
-	} else {
-		opt.Format = format
-	}
-
 	_, err = SaveTo(w, m, opt)
 	if err != nil {
 		log.Print(err)

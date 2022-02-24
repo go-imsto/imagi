@@ -82,8 +82,8 @@ func Format2Ext(f string) string {
 	return "." + f
 }
 
-// Ext2Format ...
-func Ext2Format(s string) string {
+// PatchFormat ...
+func PatchFormat(s string) string {
 	if s == "" {
 		return s
 	}
