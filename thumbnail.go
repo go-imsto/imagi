@@ -12,14 +12,16 @@ import (
 	"github.com/nfnt/resize"
 )
 
-// ThumbOption ...
+// ThumbOption 缩图选项
 type ThumbOption struct {
-	Width, Height       uint
-	MaxWidth, MaxHeight uint
-	IsFit               bool
-	IsCrop              bool
-	CropX, CropY        int
-	ctWidth, ctHeight   uint // for crop temporary
+	Width, Height       uint // 宽和高
+	MaxWidth, MaxHeight uint // 最大宽和高
+	IsFit               bool // 是否保持比例
+	IsCrop              bool // 是否裁切
+	CropX, CropY        int  // 裁切位置
+
+	ctWidth, ctHeight uint // for crop temporary
+
 	WriteOption
 }
 

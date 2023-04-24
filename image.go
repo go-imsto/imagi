@@ -99,6 +99,11 @@ func (im *Image) SaveTo(w io.Writer, opt *WriteOption) error {
 	if opt.Format == "" {
 		opt.Format = im.Format
 	}
+	if !WebpEncodable && im.Format == FormatWEBP {
+		im.rs.Seek(0, 0)
+		_, err := io.Copy(w, im.rs)
+		return err
+	}
 	var buf bytes.Buffer
 	n, err := SaveTo(&buf, im.m, opt)
 	if err != nil {
@@ -155,8 +160,6 @@ func SaveTo(w io.Writer, m image.Image, opt *WriteOption) (n int, err error) {
 		err = ErrUnsupportFormat
 		return
 	}
-
-	return
 }
 
 // ThumbnailTo ...
