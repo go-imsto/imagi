@@ -92,7 +92,7 @@ func (o *WriteOption) patch() {
 }
 
 // SaveTo ...
-func (im *Image) SaveTo(w io.Writer, opt *WriteOption) error {
+func (im *Image) SaveTo(w io.Writer, opt *WriteOption) (int, error) {
 	if opt == nil {
 		opt = new(WriteOption)
 	}
@@ -101,13 +101,13 @@ func (im *Image) SaveTo(w io.Writer, opt *WriteOption) error {
 	}
 	if !WebpEncodable && im.Format == FormatWEBP {
 		im.rs.Seek(0, 0)
-		_, err := io.Copy(w, im.rs)
-		return err
+		n, err := io.Copy(w, im.rs)
+		return int(n), err
 	}
 	var buf bytes.Buffer
 	n, err := SaveTo(&buf, im.m, opt)
 	if err != nil {
-		return err
+		return int(n), err
 	}
 	var nn int64
 	if n > im.rn {
@@ -118,7 +118,7 @@ func (im *Image) SaveTo(w io.Writer, opt *WriteOption) error {
 		nn, err = io.Copy(w, &buf)
 	}
 	log.Printf("copied %d bytes", nn)
-	return err
+	return int(nn), err
 }
 
 // SaveTo ...

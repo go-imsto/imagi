@@ -14,8 +14,10 @@ func TestWebp(t *testing.T) {
 		t.Errorf("decode err %s", err)
 		return
 	}
+	t.Logf("webp %d bytes", len(data))
 
-	im, err := Open(bytes.NewReader(data))
+	rd := bytes.NewReader(data)
+	im, err := Open(rd)
 	assert.NoError(t, err)
 	assert.NotNil(t, im)
 	assert.NotNil(t, im.Attr)
@@ -26,13 +28,18 @@ func TestWebp(t *testing.T) {
 	// assert.Equal(t, int(jpegQuality), int(im.Attr.Quality))
 	assert.Equal(t, webpOrgSize, int(im.Attr.Size))
 
-	// var buf bytes.Buffer
-	// var n int
-	// n, err = SaveTo(&buf, im.m, WriteOption{Format: "webp", Quality: webpQuality})
-	// assert.NoError(t, err)
+	var buf bytes.Buffer
+	var n int
+	n, err = im.SaveTo(&buf, &WriteOption{Format: "webp", Quality: webpQuality})
+	assert.NoError(t, err)
 
-	// assert.Equal(t, int(webpNewSize), n)
-	// assert.Equal(t, int(webpNewSize), buf.Len())
+	if WebpEncodable {
+		assert.Equal(t, int(webpNewSize), n)
+		assert.Equal(t, int(webpNewSize), buf.Len())
+	} else {
+		assert.Equal(t, int(webpOrgSize), n)
+		assert.Equal(t, int(webpOrgSize), buf.Len())
+	}
 
 	meta := im.Attr.ToMap()
 	assert.NotNil(t, meta)
