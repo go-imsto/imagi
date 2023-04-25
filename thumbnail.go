@@ -126,7 +126,7 @@ func Thumbnail(r io.Reader, w io.Writer, topt *ThumbOption) error {
 	if err != nil {
 		if err == ErrOrigTooSmall {
 			if rr, ok := r.(io.Seeker); ok {
-				rr.Seek(0, 0)
+				_, _ = rr.Seek(0, 0)
 			}
 			var written int64
 			written, err = io.Copy(w, r)

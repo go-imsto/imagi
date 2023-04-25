@@ -41,19 +41,19 @@ func GetPoint(sm, wm image.Point, pos Position) (pt image.Point) {
 	case BottomRight:
 		pt.X = int(sm.X-wm.X) - 10
 		pt.Y = int(sm.Y-wm.Y) - 10
-		break
+
 	case TopRight:
 		pt.X = int(sm.X-wm.X) - 10
 		pt.Y = 10
-		break
+
 	case BottomLeft:
 		pt.X = 10
 		pt.Y = int(sm.Y-wm.Y) - 10
-		break
+
 	case Center:
 		pt.X = int(sm.X-wm.X) / 2
 		pt.Y = int(sm.Y-wm.Y) / 2
-		break
+
 	default:
 		// left = sm.X * 0.382 - wm.X / 2
 		pt.X = int(sm.X-wm.X) / 2
@@ -69,9 +69,7 @@ type grayMask struct {
 }
 
 func newGrayMask(rect image.Rectangle, opacity Opacity) *grayMask {
-	if opacity < 0 {
-		opacity = 0
-	} else if opacity > 100 {
+	if opacity > 100 {
 		opacity = 100
 	}
 	return &grayMask{rect, uint8(255.0 * float64(opacity) / float64(100))}
@@ -104,9 +102,10 @@ func WatermarkImage(img, water image.Image, pos Position, opacity Opacity) (imag
 	}
 	// log.Printf("set watermark opacity: %.2f", float64(opacity)/float64(100))
 
-	draw.Draw(m, b, img, image.ZP, draw.Src)
+	draw.Draw(m, b, img, image.Point{}, draw.Src)
 
-	draw.DrawMask(m, wb.Add(offset), water, image.ZP, newGrayMask(water.Bounds(), opacity), image.ZP, draw.Over)
+	draw.DrawMask(m, wb.Add(offset), water, image.Point{},
+		newGrayMask(water.Bounds(), opacity), image.Point{}, draw.Over)
 
 	return m, nil
 }

@@ -100,7 +100,7 @@ func (im *Image) SaveTo(w io.Writer, opt *WriteOption) (int, error) {
 		opt.Format = im.Format
 	}
 	if !WebpEncodable && im.Format == FormatWEBP {
-		im.rs.Seek(0, 0)
+		_, _ = im.rs.Seek(0, 0)
 		n, err := io.Copy(w, im.rs)
 		return int(n), err
 	}
@@ -112,7 +112,7 @@ func (im *Image) SaveTo(w io.Writer, opt *WriteOption) (int, error) {
 	var nn int64
 	if n > im.rn {
 		log.Printf("saved %d, im size %d", n, im.rn)
-		im.rs.Seek(0, 0)
+		_, _ = im.rs.Seek(0, 0)
 		nn, err = io.Copy(w, im.rs)
 	} else {
 		nn, err = io.Copy(w, &buf)
