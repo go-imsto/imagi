@@ -64,13 +64,13 @@ func Open(rs io.ReadSeeker) (*Image, error) {
 	if mt, ok := mtypes[format]; ok {
 		attr.Mime = mt
 	}
-	attr.Size = Size(cw.Len())
+	attr.Size = uint32(cw.Len())
 	if format == FormatJPEG {
 		jr, err := jpegquality.New(rs)
 		if err != nil {
 			return nil, err
 		}
-		attr.Quality = Quality(jr.Quality())
+		attr.Quality = uint8(jr.Quality())
 	}
 	return &Image{
 		m:      m,
@@ -84,7 +84,7 @@ func Open(rs io.ReadSeeker) (*Image, error) {
 // WriteOption ...
 type WriteOption struct {
 	Format  string
-	Quality Quality
+	Quality uint8
 }
 
 func (o *WriteOption) patch() {

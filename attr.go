@@ -1,22 +1,13 @@
 package image
 
-// Dimension ...
-type Dimension uint32
-
-// Quality ...
-type Quality uint8
-
-// Size ...
-type Size uint32
-
 // Attr ...
 type Attr struct {
-	Width   Dimension `json:"width"`
-	Height  Dimension `json:"height"`
-	Quality Quality   `json:"qlt,omitempty"`  // Original quality
-	Size    Size      `json:"size,omitempty"` // Original size
-	Ext     string    `json:"ext"`            // file extension include dot
-	Mime    string    `json:"mime,omitempty"` // content type
+	Width   uint32 `json:"width"`
+	Height  uint32 `json:"height"`
+	Size    uint32 `json:"size,omitempty"` // Original size
+	Quality uint8  `json:"qlt,omitempty"`  // Original quality
+	Ext     string `json:"ext"`            // file extension include dot
+	Mime    string `json:"mime,omitempty"` // content type
 }
 
 // ToMap ...
@@ -44,12 +35,12 @@ func (a *Attr) FromMap(m map[string]interface{}) {
 	}
 	if v, ok := m["width"]; ok {
 		if vv, ok := v.(uint32); ok {
-			a.Width = Dimension(vv)
+			a.Width = vv
 		}
 	}
 	if v, ok := m["height"]; ok {
 		if vv, ok := v.(uint32); ok {
-			a.Height = Dimension(vv)
+			a.Height = vv
 		}
 	}
 	if v, ok := m["ext"]; ok {
@@ -67,8 +58,8 @@ func (a *Attr) FromMap(m map[string]interface{}) {
 // NewAttr ...
 func NewAttr(w, h uint, f string) *Attr {
 	a := &Attr{
-		Width:  Dimension(w),
-		Height: Dimension(h),
+		Width:  uint32(w),
+		Height: uint32(h),
 		Ext:    Format2Ext(f),
 	}
 	return a
