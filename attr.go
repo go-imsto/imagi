@@ -11,8 +11,8 @@ type Attr struct {
 }
 
 // ToMap ...
-func (a Attr) ToMap() map[string]interface{} {
-	m := map[string]interface{}{
+func (a Attr) ToMap() map[string]any {
+	m := map[string]any{
 		"width":  a.Width,
 		"height": a.Height,
 		"ext":    a.Ext,
@@ -26,7 +26,7 @@ func (a Attr) ToMap() map[string]interface{} {
 }
 
 // FromMap ...
-func (a *Attr) FromMap(m map[string]interface{}) {
+func (a *Attr) FromMap(m map[string]any) {
 	if m == nil {
 		return
 	}
