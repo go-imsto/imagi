@@ -58,26 +58,30 @@ func Open(rs io.ReadSeeker) (*Image, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	pt := m.Bounds().Max
-	attr := NewAttr(uint(pt.X), uint(pt.Y), format)
-	if mt, ok := mtypes[format]; ok {
-		attr.Mime = mt
+	im, err := NewFromImage(m, cw.Len(), format)
+	if err != nil {
+		return nil, err
 	}
-	attr.Size = uint32(cw.Len())
+	im.rs = rs
 	if format == FormatJPEG {
 		jr, err := jpegquality.New(rs)
 		if err != nil {
 			return nil, err
 		}
-		attr.Quality = uint8(jr.Quality())
+		im.Quality = uint8(jr.Quality())
 	}
+	return im, nil
+}
+
+func NewFromImage(m image.Image, size int, format string) (*Image, error) {
+	pt := m.Bounds().Max
+	attr := NewAttr(uint(pt.X), uint(pt.Y), format)
+	if mt, ok := mtypes[format]; ok {
+		attr.Mime = mt
+	}
+	attr.Size = uint32(size)
 	return &Image{
-		m:      m,
-		Attr:   attr,
-		Format: format,
-		rs:     rs,
-		rn:     cw.Len(),
+		m: m, Attr: attr, Format: format, rn: size,
 	}, nil
 }
 
@@ -99,7 +103,7 @@ func (im *Image) SaveTo(w io.Writer, opt *WriteOption) (int, error) {
 	if opt.Format == "" {
 		opt.Format = im.Format
 	}
-	if !WebpEncodable && im.Format == FormatWEBP {
+	if !WebpEncodable && im.Format == FormatWEBP && im.rs != nil {
 		_, _ = im.rs.Seek(0, 0)
 		n, err := io.Copy(w, im.rs)
 		return int(n), err
@@ -110,7 +114,7 @@ func (im *Image) SaveTo(w io.Writer, opt *WriteOption) (int, error) {
 		return int(n), err
 	}
 	var nn int64
-	if n > im.rn {
+	if n > im.rn && im.rs != nil {
 		log.Printf("saved %d, im size %d", n, im.rn)
 		_, _ = im.rs.Seek(0, 0)
 		nn, err = io.Copy(w, im.rs)
