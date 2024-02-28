@@ -7,7 +7,7 @@ require (
 	github.com/liut/jpegquality v0.0.0-20230324082343-795f5b3f78b7
 	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646
 	github.com/stretchr/testify v1.8.4
-	golang.org/x/image v0.13.0
+	golang.org/x/image v0.15.0
 )
 
 require (
