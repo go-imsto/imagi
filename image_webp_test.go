@@ -34,6 +34,7 @@ func TestWebp(t *testing.T) {
 	assert.NoError(t, err)
 
 	if WebpEncodable {
+		t.Log("webp encodable yes")
 		assert.Equal(t, int(webpNewSize), n)
 		assert.Equal(t, int(webpNewSize), buf.Len())
 	} else {
@@ -48,6 +49,29 @@ func TestWebp(t *testing.T) {
 	var a Attr
 	a.FromMap(meta)
 	assert.Equal(t, ".webp", a.Ext)
+}
+
+func TestWebpEnc(t *testing.T) {
+	data, err := base64.StdEncoding.DecodeString(jpegData)
+	if err != nil {
+		t.Errorf("decode err %s", err)
+		return
+	}
+	t.Logf("read %d bytes", len(data))
+
+	rd := bytes.NewReader(data)
+	im, err := Open(rd)
+	assert.NoError(t, err)
+	assert.NotNil(t, im)
+
+	if WebpEncodable {
+		t.Log("webp encodable yes")
+		var buf bytes.Buffer
+		var n int
+		n, err = im.SaveTo(&buf, &WriteOption{Format: "webp", Quality: webpQuality})
+		assert.NoError(t, err)
+		assert.NotZero(t, n)
+	}
 }
 
 const (

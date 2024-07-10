@@ -3,16 +3,18 @@ package image
 import (
 	"bytes"
 	"encoding/base64"
-	"log"
+	"log/slog"
 	"os"
 	"testing"
 
-	"github.com/liut/jpegquality"
 	"github.com/stretchr/testify/assert"
 )
 
 func init() {
-	jpegquality.SetLogger(log.New(os.Stderr, "test ", log.Ltime|log.Lshortfile))
+	th := slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{
+		Level: slog.LevelDebug,
+	})
+	slog.SetDefault(slog.New(th))
 }
 
 func TestImage(t *testing.T) {
