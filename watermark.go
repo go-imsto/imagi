@@ -5,7 +5,7 @@ import (
 	"image/color"
 	"image/draw"
 	"io"
-	"log"
+	"log/slog"
 	"os"
 	"path"
 )
@@ -115,7 +115,7 @@ func Watermark(r, wr io.Reader, w io.Writer, wo WaterOption) error {
 
 	im, format, err := image.Decode(r)
 	if err != nil {
-		log.Printf("Watermark: decode src error: %s", err)
+		slog.Info("watermark: decode fail", "err", err)
 		return err
 	}
 	if wo.Format == "" {
@@ -124,7 +124,7 @@ func Watermark(r, wr io.Reader, w io.Writer, wo WaterOption) error {
 
 	water, _, err := image.Decode(wr)
 	if err != nil {
-		log.Printf("Watermark: decode water error: %s", err)
+		slog.Info("watermark: decode water fail", "err", err)
 		return err
 	}
 
@@ -167,7 +167,7 @@ func WatermarkFile(src, wname, dest string, wo WaterOption) (err error) {
 
 	out, err = os.OpenFile(dest, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, os.FileMode(0644))
 	if err != nil {
-		log.Printf("openfile error: %s", err)
+		slog.Info("watermark: openfile fail", "err", err)
 		return
 	}
 	defer out.Close()

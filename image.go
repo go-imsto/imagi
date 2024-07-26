@@ -7,7 +7,7 @@ import (
 	"image/jpeg"
 	"image/png"
 	"io"
-	"log"
+	"log/slog"
 
 	"github.com/liut/jpegquality"
 )
@@ -115,13 +115,17 @@ func (im *Image) SaveTo(w io.Writer, opt *WriteOption) (int, error) {
 	}
 	var nn int64
 	if n > im.rn && im.rs != nil {
-		log.Printf("saved %d, im size %d", n, im.rn)
+		slog.Debug("saved", "n", n, "read length", im.rn)
 		_, _ = im.rs.Seek(0, 0)
 		nn, err = io.Copy(w, im.rs)
 	} else {
 		nn, err = io.Copy(w, &buf)
 	}
-	log.Printf("copied %d bytes", nn)
+	if err != nil {
+		slog.Info("copy fail", "err", err, "bytes", nn)
+	} else {
+		slog.Debug("copied", "bytes", nn)
+	}
 	return int(nn), err
 }
 
@@ -160,7 +164,7 @@ func SaveTo(w io.Writer, m image.Image, opt *WriteOption) (n int, err error) {
 		err = webpEncode(w, m, float32(qlt))
 		return
 	default:
-		log.Printf("opt %v", opt)
+		slog.Info("invalid format", "opt", opt)
 		err = ErrUnsupportFormat
 		return
 	}

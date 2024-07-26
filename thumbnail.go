@@ -5,7 +5,7 @@ import (
 	"image"
 	"image/draw"
 	"io"
-	"log"
+	"log/slog"
 	"os"
 	"path"
 
@@ -55,8 +55,7 @@ func (topt *ThumbOption) calc(ow, oh uint) error {
 			topt.CropX = int(float32(topt.ctWidth-topt.Width) / 2)
 			topt.CropY = int(float32(topt.ctHeight-topt.Height) / 2)
 
-			// log.Printf("cropX: %d, cropY: %d", cropX, cropY)
-			// :crop
+			// slog.Debug("opt crop", "cropX", topt.CropX, "cropY", topt.CropY)
 
 		} else {
 
@@ -88,7 +87,7 @@ func ThumbnailImage(img image.Image, topt *ThumbOption) (image.Image, error) {
 	oh := uint(ob.Dy())
 
 	if ow <= topt.Width && oh <= topt.Height {
-		log.Printf("ThumbnailImage %dx%d <= %dx%d", ow, oh, topt.Width, topt.Height)
+		slog.Debug("ThumbnailImage", "ow", ow, "oh", oh, "w", topt.Width, "h", topt.Height)
 		return img, nil
 	}
 
@@ -96,7 +95,7 @@ func ThumbnailImage(img image.Image, topt *ThumbOption) (image.Image, error) {
 	if err != nil {
 		return nil, err
 	}
-	// log.Printf("thumb option: %s", topt)
+	// slog.Debug("ThumbnailImage", "topt", topt)
 	if topt.IsFit {
 		if topt.IsCrop {
 			buf := resize.Resize(topt.ctWidth, topt.ctHeight, img, resize.Bicubic)
@@ -115,7 +114,7 @@ func Thumbnail(r io.Reader, w io.Writer, topt *ThumbOption) error {
 	var err error
 	im, format, err := image.Decode(r)
 	if err != nil {
-		log.Printf("Thumbnail image decode error: %s", err)
+		slog.Info("Thumbnail image decode fail", "err", err)
 		return err
 	}
 	if topt.Format == "" {
@@ -131,10 +130,10 @@ func Thumbnail(r io.Reader, w io.Writer, topt *ThumbOption) error {
 			var written int64
 			written, err = io.Copy(w, r)
 			if err == nil {
-				log.Printf("written %d", written)
+				slog.Debug("copied", "n", written)
 				return nil
 			}
-			log.Printf("copy error %s", err)
+			slog.Info("copy fail", "err", err)
 		}
 	}
 	return err
@@ -150,7 +149,7 @@ func ThumbnailImageTo(im image.Image, w io.Writer, topt *ThumbOption) error {
 	opt := &topt.WriteOption
 	_, err = SaveTo(w, m, opt)
 	if err != nil {
-		log.Print(err)
+		slog.Info("save to", "err", err)
 		return err
 	}
 
@@ -162,7 +161,7 @@ func ThumbnailFile(src, dest string, topt *ThumbOption) (err error) {
 	var in *os.File
 	in, err = os.Open(src)
 	if err != nil {
-		log.Print(err)
+		slog.Info("open fail", "err", err)
 		return
 	}
 	defer in.Close()
@@ -176,7 +175,7 @@ func ThumbnailFile(src, dest string, topt *ThumbOption) (err error) {
 	var out *os.File
 	out, err = os.OpenFile(dest, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, os.FileMode(0644))
 	if err != nil {
-		log.Printf("openfile error: %s", err)
+		slog.Info("openfile fail", "err", err)
 		return
 	}
 	defer out.Close()
