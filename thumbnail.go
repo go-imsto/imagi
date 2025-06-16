@@ -79,6 +79,20 @@ func (topt *ThumbOption) calc(ow, oh uint) error {
 	return nil
 }
 
+func (topt *ThumbOption) GetHeight() uint {
+	if topt.IsFit && topt.IsCrop {
+		return topt.ctHeight
+	}
+	return topt.Height
+}
+
+func (topt *ThumbOption) GetWidth() uint {
+	if topt.IsFit && topt.IsCrop {
+		return topt.ctWidth
+	}
+	return topt.Width
+}
+
 // ThumbnailImage ...
 func ThumbnailImage(img image.Image, topt *ThumbOption) (image.Image, error) {
 
