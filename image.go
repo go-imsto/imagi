@@ -116,7 +116,7 @@ func (im *Image) SaveTo(w io.Writer, opt *WriteOption) (int, error) {
 		return 0, err
 	}
 	var nn int64
-	if buf.Len() > im.rn && im.rs != nil {
+	if im.Format == opt.Format && buf.Len() > im.rn && im.rs != nil {
 		slog.Debug("saved", "n", buf.Len(), "read length", im.rn)
 		_, _ = im.rs.Seek(0, 0)
 		nn, err = io.Copy(w, im.rs)
