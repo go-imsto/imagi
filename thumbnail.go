@@ -161,7 +161,7 @@ func ThumbnailImageTo(im image.Image, w io.Writer, topt *ThumbOption) error {
 	}
 
 	opt := &topt.WriteOption
-	_, err = SaveTo(w, m, opt)
+	err = SaveTo(w, m, opt)
 	if err != nil {
 		slog.Info("save to", "err", err)
 		return err

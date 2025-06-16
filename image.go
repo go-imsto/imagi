@@ -89,6 +89,8 @@ func NewFromImage(m image.Image, size int, format string) (*Image, error) {
 type WriteOption struct {
 	Format  string
 	Quality uint8
+
+	ExtraWriter io.Writer // 额外的输出 一般用于hash计算
 }
 
 func (o *WriteOption) patch() {
@@ -109,13 +111,13 @@ func (im *Image) SaveTo(w io.Writer, opt *WriteOption) (int, error) {
 		return int(n), err
 	}
 	var buf bytes.Buffer
-	n, err := SaveTo(&buf, im.m, opt)
+	err := SaveTo(&buf, im.m, opt)
 	if err != nil {
-		return int(n), err
+		return 0, err
 	}
 	var nn int64
-	if n > im.rn && im.rs != nil {
-		slog.Debug("saved", "n", n, "read length", im.rn)
+	if buf.Len() > im.rn && im.rs != nil {
+		slog.Debug("saved", "n", buf.Len(), "read length", im.rn)
 		_, _ = im.rs.Seek(0, 0)
 		nn, err = io.Copy(w, im.rs)
 	} else {
@@ -130,13 +132,15 @@ func (im *Image) SaveTo(w io.Writer, opt *WriteOption) (int, error) {
 }
 
 // SaveTo ...
-func SaveTo(w io.Writer, m image.Image, opt *WriteOption) (n int, err error) {
+func SaveTo(w io.Writer, m image.Image, opt *WriteOption) (err error) {
 	if opt == nil {
 		opt = new(WriteOption)
 	}
-	cw := new(CountWriter)
-	defer func() { n = cw.Len() }()
-	w = io.MultiWriter(w, cw)
+
+	if opt.ExtraWriter != nil {
+		w = io.MultiWriter(w, opt.ExtraWriter)
+	}
+
 	opt.patch()
 	switch opt.Format {
 	case FormatJPEG:

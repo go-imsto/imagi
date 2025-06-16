@@ -134,7 +134,7 @@ func Watermark(r, wr io.Reader, w io.Writer, wo WaterOption) error {
 	}
 
 	opt := &wo.WriteOption
-	_, err = SaveTo(w, m, opt)
+	err = SaveTo(w, m, opt)
 	if err != nil {
 		return err
 	}
